@@ -28,7 +28,6 @@ bool carregarMapa(const string& caminho, int m[15][45]) {
             }
         }
     }
-
     arquivo.close();
     return true;
 }
@@ -76,6 +75,16 @@ void desenhoMapa(int m[15][45], int x, int y, int xInimigo[], int yInimigo[]){
                             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), BACKGROUND_GREEN | BACKGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
                             cout << char(64);
                             break;
+                        case 5:
+                        case 6:
+                        case 7:
+                        case 8:
+                        case 9:
+                        case 10:
+                        case 11:
+                            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), BACKGROUND_GREEN | BACKGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+                            cout << char(158);
+                            break;
                     }
                     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), BACKGROUND_GREEN | BACKGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
                 }
@@ -105,22 +114,22 @@ void movimento(int m[15][45], int &x, int &y, int &contBomba, int &xBomba, int &
         tecla = getch();
         switch((unsigned char)tecla){
             case 72: case 'w':
-                if (x-1 >= 0 && (m[x-1][y] == 0 || m[x-1][y] == 4)){
+                if (x-1 >= 0 && (m[x-1][y] == 0 || m[x-1][y] > 3)){
                     x--;
                 }
                 break;
             case 80: case 's':
-                if (x+1 < 15 && (m[x+1][y] == 0 || m[x+1][y] == 4)){
+                if (x+1 < 15 && (m[x+1][y] == 0 || m[x+1][y] > 3)){
                     x++;
                 }
                 break;
             case 75: case 'a':
-                if (y-1 >= 0 && (m[x][y-1] == 0 || m[x][y-1] == 4)){
+                if (y-1 >= 0 && (m[x][y-1] == 0 || m[x][y-1] > 3)){
                     y--;
                 }
                 break;
             case 77: case 'd':
-                if (y+1 < 45 && (m[x][y+1] == 0 || m[x][y+1] == 4)){
+                if (y+1 < 45 && (m[x][y+1] == 0 || m[x][y+1] > 3)){
                     y++;
                 }
                 break;
@@ -136,6 +145,17 @@ void movimento(int m[15][45], int &x, int &y, int &contBomba, int &xBomba, int &
         }
     }
 }
+
+//void coletarItem(int m[15][45], int x, int y, int &itemColetado, int &vidas){
+  //  for(int i = 0; i < 15; i++){
+    //    for(int j = 0; j < 45; j++){
+      //      if(m[i][j] == 5){
+        //        m[i][j] = 4;
+          //      item = 5;
+           // }
+    //    }
+  //  }
+//}
 /// Função movimento Inimigos
 void movimentoInimigos(int m[15][45], int xInimigo[], int yInimigo[]){
     for(int k = 0; k < 3; k++){
@@ -147,7 +167,7 @@ void movimentoInimigos(int m[15][45], int xInimigo[], int yInimigo[]){
             int proximoX = novoX;
             int proximoY = novoY;
 
-            // defini a direção dos movimentos
+            // define a direção dos movimentos
             switch(direcao){
                 case 0: proximoX--; break;
                 case 1: proximoX++; break;
@@ -180,13 +200,35 @@ void explosaoBomba(int m[15][45], int xBomba, int yBomba, int &contBomba){
         int x = xBomba;
         int y = yBomba;
 
-        for (int passo = 1; passo <= 2; passo++) {
+        for (int passo = 1; passo <= 3; passo++) {
             x += dx[i];
             y += dy[i];
             if (x < 0 || x >= 15 || y < 0 || y >= 45){
                 break;
             }
             if (m[x][y] == 1){
+                break;
+            }
+            if(m[x][y] == 2 && x == 5 && y == 17){
+                m[x][y] = 5;
+                break;
+            }else  if(m[x][y] == 2 && x == 12 && y == 1){
+                m[x][y] = 6;
+                break;
+            }else if(m[x][y] == 2 && x == 9 && y == 16){
+                m[x][y] = 7;
+                break;
+            }else if(m[x][y] == 2 && x == 13 && y == 27){
+                m[x][y] = 8;
+                break;
+            }else if(m[x][y] == 2 && x == 3 && y == 20){
+                m[x][y] = 9;
+                break;
+            }else if(m[x][y] == 2 && x == 6 && y == 36){
+                m[x][y] = 10;
+                break;
+            }else if(m[x][y] == 2 && x == 1 && y == 32){
+                m[x][y] = 11;
                 break;
             }
             m[x][y] = 4;
@@ -244,6 +286,7 @@ int main()
     int xInimigo[3] = {10, 4, 3};
     int yInimigo[3] = {10, 20, 42};
     int vidas = 3;
+    int itemColetado = 0;
 
     unsigned long tempoAtual = GetTickCount();
     unsigned long tempoUltimoMovimentoInimigos = 0;
@@ -264,7 +307,9 @@ int main()
 
         desenhoMapa(m, x, y, xInimigo, yInimigo);
         movimento(m, x, y, contBomba, xBomba, yBomba, tempoBomba, tecla);
+        //coletarItem(m, x, y, itemColetado, vidas, velocidade);
         atualizarBomba(m, contBomba, tempoBomba, xBomba, yBomba);
+
 
         bool encostouInimigo = false;
         for (int k = 0; k < 3; k++) {
